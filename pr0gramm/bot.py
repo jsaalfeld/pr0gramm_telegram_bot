@@ -43,7 +43,7 @@ class Pr0grammBot:
 
     def __send_top_sfw_image(self, chat_id):
         self.__bot.sendChatAction(chat_id=chat_id, action='upload_photo')
-        data = self.__api.get_new_sfw_image()
+        data = self.__api.get_top_sfw_image()
 
         # TODO download photo temporally and send the image
         self.__bot.sendMessage(chat_id=chat_id, text=data['image'])

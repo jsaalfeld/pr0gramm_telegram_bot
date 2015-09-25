@@ -35,9 +35,9 @@ class Pr0grammAPI:
         else:
             print('could not login. only SFW images available')
 
-    def get_new_sfw_image(self):
+    def get_top_sfw_image(self):
         r = requests.get(self.items_url,
-                         params={'flags': 1, 'promoted': 0},
+                         params={'flags': 1, 'promoted': 1},
                          cookies=self.__login_cookie)
         item_cache = r.json()['items'][0]
 

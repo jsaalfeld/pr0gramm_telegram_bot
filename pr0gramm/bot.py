@@ -10,8 +10,9 @@ class Pr0grammBot:
         self.__bot = telegram.Bot(token=config.get('b0t', 'token'))
 
         # available commands with their corresponding bot method
+        # scope the with __ so they are mangled by python
         self.available_commands = {
-            'sfw_beliebt': '_send_top_sfw_image'
+            'sfw_beliebt': '__send_top_sfw_image'
         }
 
         self.__api.login()
@@ -36,7 +37,7 @@ class Pr0grammBot:
 
         if text in self.available_commands:
             try:
-                getattr(self, self.available_commands[text])(chat_id)
+                getattr(self, '_' + self.__class__.__name__ + self.available_commands[text])(chat_id)
             except AttributeError:
                 print("could not call method", self.available_commands[text])
 

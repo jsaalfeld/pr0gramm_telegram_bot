@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import configparser
-from pr0grammbot import Pr0grammBot
+from pr0gramm.bot import Pr0grammBot
 
 
 def main():

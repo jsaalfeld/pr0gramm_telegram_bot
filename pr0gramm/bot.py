@@ -1,5 +1,5 @@
 import telegram
-from pr0grammapi import Pr0grammAPI
+from pr0gramm.api import Pr0grammAPI
 
 
 class Pr0grammBot:

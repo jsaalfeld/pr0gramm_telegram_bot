@@ -4,13 +4,17 @@ from pr0gramm.api import Pr0grammAPI
 
 class Pr0grammBot:
     def __init__(self, config):
-        self.__api = Pr0grammAPI(config.get('b0t', 'username'), config.get('b0t', 'password'))
+        self.__api = Pr0grammAPI(username=config.get('b0t', 'username'),
+                                 password=config.get('b0t', 'password'),
+                                 tmp_dir=config.get('b0t', 'tmp_dir'))
         self.__bot = telegram.Bot(token=config.get('b0t', 'token'))
 
         # available commands with their corresponding bot method
         self.available_commands = {
             'sfw_beliebt': '_send_top_sfw_image'
         }
+
+        self.__api.login()
 
         # try to get latest update id
         try:

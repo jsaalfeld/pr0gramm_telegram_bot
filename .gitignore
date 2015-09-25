@@ -1,5 +1,8 @@
 ### project settings
 config.cfg
+.tmp/**
+
+!.gitkeep
 
 ### Windows template
 # Windows image file caches

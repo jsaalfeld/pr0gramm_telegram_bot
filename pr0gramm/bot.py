@@ -1,5 +1,4 @@
 import os
-from urllib.parse import urlparse
 import requests
 import telegram
 import time
@@ -13,11 +12,10 @@ class Pr0grammBot:
                                  tmp_dir=config.get('b0t', 'tmp_dir'))
         self.__bot = telegram.Bot(token=config.get('b0t', 'token'))
         self.__tmp_dir = config.get('b0t', 'tmp_dir')
-        self.__tmp_image = {'ext': '', 'path': ''}
-        # already downloaded and send files. key is pr0_id and value telegram_id
-        # possible an memory leak if this bot runs for a wile. should be cleaned after some time
-        # TODO persist this and clean it up
-        self.__send_files = {}
+        self.__tmp_image = ''
+        # already downloaded and send files. sorted by flag.
+        #  if we get an new image for an flag the old one will be replaced
+        self.__cache = {}
 
         # available commands with their corresponding bot method
         # scope the with __ so they are mangled by python
@@ -34,18 +32,24 @@ class Pr0grammBot:
         except IndexError:
             self.__LAST_UPDATE_ID = None
 
+    def __image_is_cached(self, data):
+        if data['flag'] not in self.__cache:
+            return False
+
+        if data['id'] == self.__cache[data['flag']]['p_id']:
+            return True
+
+        return False
+
     def __download_tmp_image(self, data):
-        if data['id'] in self.__send_files:
+        if self.__image_is_cached(data):
             return
 
-        url = data['image']
-        r = requests.get(url, stream=True)
-
-        self.__tmp_image['ext'] = os.path.splitext(urlparse(url).path)[1]
+        r = requests.get(data['image'], stream=True)
 
         if r.status_code == 200:
-            self.__tmp_image['path'] = os.path.join(self.__tmp_dir, str(int(time.time())) + self.__tmp_image['ext'])
-            with open(self.__tmp_image['path'], 'wb') as f:
+            self.__tmp_image = os.path.join(self.__tmp_dir, str(int(time.time())) + data['image_ext'])
+            with open(self.__tmp_image, 'wb') as f:
                 for chunk in r:
                     f.write(chunk)
 
@@ -66,28 +70,30 @@ class Pr0grammBot:
                 getattr(self, '_' + self.__class__.__name__ + self.available_commands[text])(chat_id)
 
                 # clean up send image
-                if os.path.isfile(self.__tmp_image['path']):
-                    os.remove(self.__tmp_image['path'])
-                self.__tmp_image = {'ext': '', 'path': ''}
+                if os.path.isfile(self.__tmp_image):
+                    os.remove(self.__tmp_image)
+                self.__tmp_image = ''
             except AttributeError:
                 print("could not call method", self.available_commands[text])
 
     def __send_image(self, chat_id, data):
         try:
-            if data['id'] not in self.__send_files:
-                f = open(self.__tmp_image['path'], 'rb')
+            if not self.__image_is_cached(data):
+                f = open(self.__tmp_image, 'rb')
             else:
-                f = self.__send_files[data['id']]
+                f = self.__cache[data['flag']]['t_id']
 
             # TODO add caption -> tags, up and downvotes
-            if self.__tmp_image['ext'] == '.webm':
+            if data['image_ext'] == '.webm':
                 # TODO convert webm to mp4
                 file_id = self.__bot.sendDocument(chat_id=chat_id, document=f).document.file_id
             else:
                 file_id = self.__bot.sendPhoto(chat_id=chat_id, photo=f).photo[-1].file_id
 
-            if data['id'] not in self.__send_files:
-                self.__send_files[data['id']] = file_id
+            if not self.__image_is_cached(data):
+                self.__cache[data['flag']] = {}
+                self.__cache[data['flag']]['p_id'] = data['id']
+                self.__cache[data['flag']]['t_id'] = file_id
                 f.close()
 
             return

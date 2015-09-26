@@ -1,5 +1,6 @@
 import json
 import os
+from urllib.parse import urlparse
 import requests
 
 
@@ -48,6 +49,8 @@ class Pr0grammAPI:
         return {
             'id': item_cache['id'],
             'image': self.image_url + item_cache['image'],
+            'image_ext': os.path.splitext(urlparse(self.image_url + item_cache['image']).path)[1],
             'up': item_cache['up'],
-            'down': item_cache['down']
+            'down': item_cache['down'],
+            'flag': flag
         }

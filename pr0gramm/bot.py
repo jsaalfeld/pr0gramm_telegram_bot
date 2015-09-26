@@ -1,8 +1,11 @@
+import logging
 import os
 import requests
 import telegram
 import time
 from pr0gramm.api import Pr0grammAPI
+
+log = logging.getLogger('pr0Bot.bot')
 
 
 class Pr0grammBot:
@@ -24,13 +27,17 @@ class Pr0grammBot:
             'nsfw_beliebt': '__send_top_nsfw_image',
             'nsfl_beliebt': '__send_top_nsfl_image'
         }
+        log.info('Available commands: %s', self.available_commands.keys())
 
         self.__api.login()
         # try to get latest update id
         try:
+            log.debug('Trying to get latest update ID from telegram API')
             self.__LAST_UPDATE_ID = self.__bot.getUpdates()[-1].update_id
         except IndexError:
             self.__LAST_UPDATE_ID = None
+
+        log.debug('Latest update ID: %s', self.__LAST_UPDATE_ID)
 
     def __image_is_cached(self, data):
         if data['flag'] not in self.__cache:

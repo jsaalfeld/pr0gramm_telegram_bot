@@ -84,7 +84,7 @@ class Pr0grammBot:
                 f = self.__cache[data['flag']]['t_id']
 
             # TODO add caption -> tags, up and downvotes
-            if data['image_ext'] == '.webm':
+            if data['image_ext'] == '.webm' or data['image_ext'] == '.gif':
                 # TODO convert webm to mp4
                 file_id = self.__bot.sendDocument(chat_id=chat_id, document=f).document.file_id
             else:

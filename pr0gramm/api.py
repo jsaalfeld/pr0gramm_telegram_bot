@@ -49,10 +49,17 @@ class Pr0grammAPI:
             log.warn('Login not possible. Only SFW/NSFW images available.')
 
     def get_top_image(self, flag):
-        r = requests.get(self.items_url,
-                         params={'flags': flag, 'promoted': 1},
-                         cookies=self.__login_cookie)
-        item_cache = r.json()['items'][0]
+        log.debug('Getting top image for flag %d', flag)
+
+        try:
+            r = requests.get(self.items_url,
+                             params={'flags': flag, 'promoted': 1},
+                             cookies=self.__login_cookie)
+            item_cache = r.json()['items'][0]
+        except (ConnectionError, TimeoutError):
+            log.warn('Could not reach pr0gramm API.')
+
+        log.debug('Got image with id %d', item_cache['id'])
 
         '''
         r = requests.get(self.item_url, params={'itemId': item_cache['id']})

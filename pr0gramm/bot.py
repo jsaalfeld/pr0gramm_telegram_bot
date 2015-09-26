@@ -40,25 +40,30 @@ class Pr0grammBot:
         log.debug('Latest update ID: %s', self.__LAST_UPDATE_ID)
 
     def __image_is_cached(self, data):
-        if data['flag'] not in self.__cache:
-            return False
-
-        if data['id'] == self.__cache[data['flag']]['p_id']:
+        if data['flag'] in self.__cache and \
+                data['id'] == self.__cache[data['flag']]['p_id']:
+            log.debug('Image %d in cache.', data['id'])
             return True
 
+        log.debug('Image %d not in cache.', data['id'])
         return False
 
     def __download_tmp_image(self, data):
         if self.__image_is_cached(data):
             return
 
+        log.debug('Downloading image (%s).', data['image'])
         r = requests.get(data['image'], stream=True)
 
         if r.status_code == 200:
+            log.debug('Image successful downloaded.')
             self.__tmp_image = os.path.join(self.__tmp_dir, str(int(time.time())) + data['image_ext'])
-            with open(self.__tmp_image, 'wb') as f:
-                for chunk in r:
-                    f.write(chunk)
+            try:
+                with open(self.__tmp_image, 'wb') as f:
+                    for chunk in r:
+                        f.write(chunk)
+            except IOError:
+                log.critical('Could not write image file (%s).', self.__tmp_image)
 
     def __parse_message(self, update):
         text = update.message.text

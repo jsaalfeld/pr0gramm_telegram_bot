@@ -78,7 +78,7 @@ class Pr0grammBot:
         text = text[1:]
 
         if text in self.available_commands:
-            log.debug('Found valid command %s. Calling ', text, '_' + self.__class__.__name__ + self.available_commands[text])
+            log.debug('Found valid command %s. Calling %s', text, '_' + self.__class__.__name__ + self.available_commands[text])
             try:
                 getattr(self, '_' + self.__class__.__name__ + self.available_commands[text])(chat_id)
 

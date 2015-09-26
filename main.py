@@ -7,6 +7,9 @@ from pr0gramm.bot import Pr0grammBot
 
 log = logging.getLogger('pr0Bot.main')
 
+# set logging level for telegram bot explicit to WARN so we get only relevant messages
+logging.getLogger('telegram.bot').setLevel(logging.WARN)
+
 
 def main():
     logging.basicConfig(level=logging.INFO)

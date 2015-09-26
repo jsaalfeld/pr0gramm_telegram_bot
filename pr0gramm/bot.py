@@ -126,18 +126,21 @@ class Pr0grammBot:
         self.__bot.sendMessage(chat_id=chat_id, text='Whoops. ¯\_(ツ)_/¯')
 
     def __send_top_sfw_image(self, chat_id):
+        log.debug('Sending top sfw image to chat %d', chat_id)
         self.__bot.sendChatAction(chat_id=chat_id, action='upload_photo')
         data = self.__api.get_top_image(1)
         self.__download_tmp_image(data)
         self.__send_image(chat_id=chat_id, data=data)
 
     def __send_top_nsfw_image(self, chat_id):
+        log.debug('Sending top nsfw image to chat %d', chat_id)
         self.__bot.sendChatAction(chat_id=chat_id, action='upload_photo')
         data = self.__api.get_top_image(2)
         self.__download_tmp_image(data)
         self.__send_image(chat_id=chat_id, data=data)
 
     def __send_top_nsfl_image(self, chat_id):
+        log.debug('Sending top nsfl image to chat %d', chat_id)
         self.__bot.sendChatAction(chat_id=chat_id, action='upload_photo')
         data = self.__api.get_top_image(4)
         self.__download_tmp_image(data)

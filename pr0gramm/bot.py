@@ -97,29 +97,32 @@ class Pr0grammBot:
             if not self.__image_is_cached(data):
                 f = open(self.__tmp_image, 'rb')
             else:
+                log.debug('Sending file_id instead regular file.')
                 f = self.__cache[data['flag']]['t_id']
 
             # TODO add caption -> tags, up and downvotes
             if data['image_ext'] == '.webm' or data['image_ext'] == '.gif':
                 # TODO convert webm to mp4
+                log.debug('Sending document (%s).', data['image_ext'])
                 file_id = self.__bot.sendDocument(chat_id=chat_id, document=f).document.file_id
             else:
+                log.debug('Sending photo.')
                 file_id = self.__bot.sendPhoto(chat_id=chat_id, photo=f).photo[-1].file_id
 
             if not self.__image_is_cached(data):
+                log.debug('Added image %s to cache.', data['id'])
                 self.__cache[data['flag']] = {}
                 self.__cache[data['flag']]['p_id'] = data['id']
                 self.__cache[data['flag']]['t_id'] = file_id
                 f.close()
 
             return
-        except telegram.TelegramError as e:
-            print(e)
-        except IOError as e:
-            print(e)
+        except (telegram.TelegramError, IOError) as e:
+            log.warn(e)
         except AttributeError:
-            print('could not obtain file id')
+            log.warn('could not obtain file id.')
 
+        log.warn('Could not send image to user.')
         self.__bot.sendMessage(chat_id=chat_id, text='Whoops. ¯\_(ツ)_/¯')
 
     def __send_top_sfw_image(self, chat_id):

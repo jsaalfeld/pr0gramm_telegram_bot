@@ -69,7 +69,7 @@ class Pr0grammBot:
         text = update.message.text
         chat_id = update.message.chat_id
 
-        print(text)
+        log.debug('Received message: %s', text)
 
         if not text.startswith('/'):
             return
@@ -78,15 +78,19 @@ class Pr0grammBot:
         text = text[1:]
 
         if text in self.available_commands:
+            log.debug('Found valid command %s. Calling ', text, '_' + self.__class__.__name__ + self.available_commands[text])
             try:
                 getattr(self, '_' + self.__class__.__name__ + self.available_commands[text])(chat_id)
 
                 # clean up send image
                 if os.path.isfile(self.__tmp_image):
-                    os.remove(self.__tmp_image)
+                    try:
+                        os.remove(self.__tmp_image)
+                    except OSError as e:
+                        log.warn('Could not remove file (%s): %s', self.__tmp_image, e)
                 self.__tmp_image = ''
             except AttributeError:
-                print("could not call method", self.available_commands[text])
+                log.warn('Could not call method %s for command %s.', self.available_commands[text], text)
 
     def __send_image(self, chat_id, data):
         try:

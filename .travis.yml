@@ -11,4 +11,4 @@ install:
   - pip install requests
 
 script:
-  - test.py
+  - python test.py

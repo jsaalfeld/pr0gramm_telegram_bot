@@ -2,7 +2,7 @@
 branches:
   only:
     - master
-	- develop
+    - develop
 
 language: python
 

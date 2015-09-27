@@ -6,6 +6,9 @@ python:
   - "3.4"
   - "3.5"
 
+before_install:
+  - mv example_config.cfg config.cfg
+
 install:
   - pip install python-telegram-bot
   - pip install requests
